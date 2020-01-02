@@ -60,9 +60,11 @@ for timestamp in timestamps:
 chat_data = pd.DataFrame({'Date': dates, 'Time': hours, 'Content': content, 'Person': person})
 #chat_data = pd.DataFrame(list(zip(dates, hours, content, person)), columns = ['Date', 'Time', 'Content', 'Person'])
 
-names = np.delete(chat_data['Person'].unique(),np.where(chat_data['Person'].unique()=='-'))
+names = np.delete(chat_data['Person'].unique(), np.where(chat_data['Person'].unique() == '-'))
 
 #TO DO
+#Most common words, consider how this works
+#Eliminate '<Media omitted\n>' from the word count
 #Graphs for monthly number of messages
 #Monthly word averages
 #Monthly word count
@@ -74,8 +76,9 @@ for name in names:
 
 for person in people:
     person.msg_count = sum(chat_data['Person'] == person.name)
-    person.word_count = sum(chat_data[chat_data['Person'] == person.name]['Content'].apply(lambda x: len(x.split())))
+    person.count_words(chat_data)
     person.calculate_average()
+    person.most_common_words(chat_data)
     print(person)
 
 # print('Kamil sent ' + str(round((1 - kamil_msg/sara_msg)*100)) + '% less messages than Sara')
