@@ -4,6 +4,8 @@ import numpy as np
 import time
 from datetime import datetime
 from time import mktime
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def chat_fix(messages, timestamps):
@@ -62,9 +64,17 @@ chat_data = pd.DataFrame({'Date': dates, 'Time': hours, 'Content': content, 'Per
 
 names = np.delete(chat_data['Person'].unique(), np.where(chat_data['Person'].unique() == '-'))
 
+#byMonth = chat_data.groupby(chat_data['Date'].apply(lambda dt: dt.month)).count()
+#byMonthPlot = sns.countplot(x=chat_data['Date'][1:].apply(lambda dt: dt.month), data=chat_data, hue=chat_data[chat_data['Person'] != '-']['Person'])
+byMonthPlot = sns.countplot(x=chat_data[chat_data['Date'].apply(lambda dt: dt.year) == 2019]['Date'][1:].apply(lambda dt: dt.month), data=chat_data, hue=chat_data[chat_data['Person'] != '-']['Person'])
+plt.xlabel('Month')
+plt.show()
+figure = byMonthPlot.get_figure()
+figure.savefig('byMonthPlot.png')
+
 #TO DO
-#Most common words, consider how this works
-#Eliminate '<Media omitted\n>' from the word count
+#This exists: df['timeStamp'] = pd.to_datetime(df['timeStamp'])
+#improve printing of the most common words
 #Graphs for monthly number of messages
 #Monthly word averages
 #Monthly word count
@@ -75,10 +85,11 @@ for name in names:
     people.append(Person(name))
 
 for person in people:
-    person.msg_count = sum(chat_data['Person'] == person.name)
+    person.count_messages(chat_data)
     person.count_words(chat_data)
     person.calculate_average()
     person.most_common_words(chat_data)
+    person.count_media(chat_data)
     print(person)
 
 # print('Kamil sent ' + str(round((1 - kamil_msg/sara_msg)*100)) + '% less messages than Sara')

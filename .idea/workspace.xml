@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="01e9b645-801c-4277-8d81-409c81059e04" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Jupyter_testing-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Jupyter_testing-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Jupyter_testing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Jupyter_testing.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WhatsApp Chat with Sara.txt" beforeDir="false" afterPath="$PROJECT_DIR$/WhatsApp Chat with Sara.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/person.py" beforeDir="false" afterPath="$PROJECT_DIR$/person.py" afterDir="false" />
     </list>
@@ -124,7 +124,7 @@
       <option name="presentableId" value="Default" />
       <updated>1574290476714</updated>
       <workItem from="1574290484091" duration="16658000" />
-      <workItem from="1577482005042" duration="21843000" />
+      <workItem from="1577482005042" duration="30354000" />
     </task>
     <task id="LOCAL-00001" summary="Added Pandas and extracted all the basic data from the chat">
       <created>1577810288132</created>
@@ -140,7 +140,14 @@
       <option name="project" value="LOCAL" />
       <updated>1577908016508</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added most common words determination and moved some functions the person class">
+      <created>1577992707045</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1577992707045</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -160,9 +167,10 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added Pandas and extracted all the basic data from the chat" />
     <MESSAGE value="Created the people objects and calculated basic information." />
-    <option name="LAST_COMMIT_MESSAGE" value="Created the people objects and calculated basic information." />
+    <MESSAGE value="Added most common words determination and moved some functions the person class" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added most common words determination and moved some functions the person class" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/whatsapp_analyser$main.coverage" NAME="main Coverage Results" MODIFIED="1577992631148" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/whatsapp_analyser$main.coverage" NAME="main Coverage Results" MODIFIED="1578078540787" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
