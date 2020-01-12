@@ -40,8 +40,11 @@ names = []
 person = []
 timestamps = []
 content = []
-dates = []
 hours = []
+
+day = []
+month = []
+year = []
 
 chat_fix(messages, timestamps)
 
@@ -56,29 +59,31 @@ for message in messages:
         person.append('-')
 
 for timestamp in timestamps:
-    dates.append(datetime.fromtimestamp(mktime(timestamp)).date())
+    day.append(datetime.fromtimestamp(mktime(timestamp)).date().day)
+    month.append(datetime.fromtimestamp(mktime(timestamp)).date().month)
+    year.append(datetime.fromtimestamp(mktime(timestamp)).date().year)
     hours.append(datetime.fromtimestamp(mktime(timestamp)).time())
 
-chat_data = pd.DataFrame({'Date': dates, 'Time': hours, 'Content': content, 'Person': person})
+index = pd.MultiIndex.from_arrays([year, month, day, person], names=['Year', 'Month', 'Day', 'Person'])
+
+chat_data = pd.DataFrame({'Time': hours, 'Content': content}, index=index)
 #chat_data = pd.DataFrame(list(zip(dates, hours, content, person)), columns = ['Date', 'Time', 'Content', 'Person'])
+chat_data.drop('-', level='Person', inplace=True)
 
-names = np.delete(chat_data['Person'].unique(), np.where(chat_data['Person'].unique() == '-'))
+# list of names of people in the conversation
+names = set(person)
+names.remove('-')
 
-#byMonth = chat_data.groupby(chat_data['Date'].apply(lambda dt: dt.month)).count()
-#byMonthPlot = sns.countplot(x=chat_data['Date'][1:].apply(lambda dt: dt.month), data=chat_data, hue=chat_data[chat_data['Person'] != '-']['Person'])
-byMonthPlot = sns.countplot(x=chat_data[chat_data['Date'].apply(lambda dt: dt.year) == 2019]['Date'][1:].apply(lambda dt: dt.month), data=chat_data, hue=chat_data[chat_data['Person'] != '-']['Person'])
-plt.xlabel('Month')
-plt.show()
-figure = byMonthPlot.get_figure()
-figure.savefig('byMonthPlot.png')
-
-#TO DO
-#This exists: df['timeStamp'] = pd.to_datetime(df['timeStamp'])
-#improve printing of the most common words
-#Graphs for monthly number of messages
-#Monthly word averages
-#Monthly word count
-#Most common time of chatting, most common day, month as well
+# TO DO
+# maybe useful embark = pd.get_dummies(train['Embarked'], drop_first=True)
+# saving text to file
+# Explore plt.figure and how it can link to the seaborn plot
+# Groupby can be done based on multiple columns df.groupby(['Day of Week', 'Hour']).count()
+# improve printing of the most common words
+# Graphs for monthly number of messages
+# Monthly word averages
+# Monthly word count
+# Most common time of chatting, most common day, month as well
 
 # This loop creates a person object for each person participating in the chat
 for name in names:
@@ -86,11 +91,38 @@ for name in names:
 
 for person in people:
     person.count_messages(chat_data)
+    person.most_common_words(chat_data)
     person.count_words(chat_data)
     person.calculate_average()
-    person.most_common_words(chat_data)
     person.count_media(chat_data)
     print(person)
+'''
+sns.set_style('darkgrid')
+# plot of the amount of messages per month per person (here, specifically for 2019)
+figure1, ax1 = plt.subplots()
+sns.countplot(x=chat_data.loc[2019].index.get_level_values(level='Month'), data=chat_data.loc[2019], hue=chat_data.loc[2019].index.get_level_values(level='Person'))
+figure1.savefig('MSGbyMonthPlot.png')
+
+# plot of the amount of messages per day per person (here, specifically for 2019)
+figure2, ax2 = plt.subplots()
+sns.countplot(x=chat_data.loc[2019].index.get_level_values(level='Day'), data=chat_data.loc[2019], hue=chat_data.loc[2019].index.get_level_values(level='Person'))
+figure2.savefig('MSGbyDayPlot.png')
+'''
+# plot of the amount of words per month per person (here, specifically for 2019)
+# have the person class calculate these in the loop probably
+words_sara = chat_data[chat_data['Content'] != '<Media omitted>\n'].xs('Sara', level='Person')['Content'].apply(lambda x: len(x.split()))
+words_sum_sara = words_sara.groupby('Month').sum()
+words_kamil = chat_data[chat_data['Content'] != '<Media omitted>\n'].xs('Kamil Kuźniak', level='Person')['Content'].apply(lambda x: len(x.split()))
+words_sum_kamil = words_kamil.groupby('Month').sum()
+
+figure3, ax3 = plt.subplots()
+sns.barplot(x=words_sum_sara.index, y=words_sum_sara, alpha=0.5, color='red')
+sns.barplot(x=words_sum_kamil.index, y=words_sum_kamil, alpha=0.5, color='blue')
+figure3.savefig('WordsByMonthPlot.png')
+
+plt.tight_layout()
+plt.show()
+
 
 # print('Kamil sent ' + str(round((1 - kamil_msg/sara_msg)*100)) + '% less messages than Sara')
 # print('Kamil sent ' + str(round((1 - kamil_words / sara_words) * 100)) + '% less words than Sara')
