@@ -1,5 +1,8 @@
 import pandas as pd
-
+import numpy as np
+# used to remove common, useless words and punctuation
+from nltk.corpus import stopwords
+import string
 
 class Person:
     def __init__(self, name):
@@ -9,6 +12,9 @@ class Person:
         self.word_avg = 0
         self.top_words = []
         self.media_count = 0
+        self.word_count_by_month = []
+        self.word_count_by_day = []
+        self.word_count_by_hour = []
 
     def count_messages(self, chat_data):
         self.msg_count = chat_data.xs(self.name, level='Person').count()[0]
@@ -16,17 +22,26 @@ class Person:
     def calculate_average(self, ):
         self.word_avg = round(self.word_count / self.msg_count)
 
-    def count_words(self, chat_data):
-        self.word_count = chat_data[chat_data['Content'] != '<Media omitted>\n'].xs(self.name, level='Person')['Content'].apply(lambda x: len(x.split())).sum()
+    def count_total_words(self, chat_data):
+        self.word_count = chat_data.xs(self.name, level='Person')['Word count'].sum()
+
+    # change this because I added the column with the word number in each sentence
+    def count_words_by_month_day_hour(self, chat_data):
+        self.word_count_by_month = chat_data.loc[2019][chat_data.loc[2019]['Content'] != '<Media omitted>\n'].xs(self.name, level='Person')['Content'].apply(lambda x: len(x.split()))
+        self.word_count_by_month = self.word_count_by_month.groupby('Month').sum()
+        self.word_count_by_day = self.word_count_by_month.groupby('Day').sum()
+        self.word_count_by_hour = self.word_count_by_hour.groupby('Hour').sum()
 
     def most_common_words(self, chat_data):
         # join connects all the messages from the chat_data into one huge string that is than lower cased and split
         # into a list of all words that is then cast as a pandas series and value_counts is used on it
-        self.top_words = pd.Series(' '.join(chat_data[chat_data['Content'] != '<Media omitted>\n']
-            .xs(self.name, level='Person')['Content']).lower().split()).value_counts()[:10]
+        self.top_words = pd.Series(' '.join(chat_data[chat_data['Content'] !='<Media omitted>\n'].xs(self.name, level='Person')['Content']).lower().split())
+        # self.top_words = pd.Series(''.join([char for char in self.top_words if char not in string.punctuation]).split())
+        self.top_words = self.top_words[np.logical_not(self.top_words.isin(stopwords.words('english')))].value_counts()[:10]
 
     def count_media(self, chat_data):
-        self.media_count = chat_data[chat_data['Content'] == '<Media omitted>\n'].xs(self.name, level='Person').count()[0]
+        self.media_count = chat_data[chat_data['Content'] == '<Media omitted>\n'].xs(self.name, level='Person').count()[
+            0]
 
     def __str__(self):
         return self.name + ' sent: ' + str(self.msg_count) + ' messages and ' + str(self.word_count) + \
