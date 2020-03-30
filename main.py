@@ -13,7 +13,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 
 
 #pipeline = Pipeline([
@@ -40,6 +40,8 @@ def classify_msg(chat_data):
     predictions = pipeline.predict(X_test)
 
     print(classification_report(predictions, y_test))
+    print('\n')
+    print(confusion_matrix(predictions, y_test))
 
 def chat_fix(messages, timestamps):
     # Fixing the messages list from errors resulting from the multiline messages in the original file and creating a dates list
@@ -87,6 +89,7 @@ month = []
 year = []
 
 words_by_month = pd.DataFrame()
+words_by_hour = pd.DataFrame()
 
 chat_fix(messages, timestamps)
 
@@ -120,31 +123,18 @@ names = set(person)
 names.remove('-')
 
 # TO DO
-# general.calendar_plot(df, year=2017, how='count', column='index')
-# add to the chat_data dataframe info about number of words and letter for each message and length
-# pandas can do this df['date'] = pd.to_datetime(df['date']), in Keras 2 notebook maybe a better way to extract year and month
-# .rstrip() for removing whitespaces from strings, maybe useful
-# clean_mess = [word for word in nopunc.split() if word.lower() not in stopwords.words('english')]
-# I might need to first download stopwords # nltk.download_shell()
-# nltk stemming can be interesting #not really after all
-# train_data.itertuples() allows to iterate over the rows of a dataframe
-# average time between responding to texts
+# change file opening to more general
+# add documentation
 # check if words per hour count is correct
-# Properly make a new dataframe with features calculated and indexed per month and per person
-# maybe do the same per hour as well, then need to add an hour to the multi index
-# maybe useful embark = pd.get_dummies(train['Embarked'], drop_first=True)
 # saving text to file
 # Explore plt.figure and how it can link to the seaborn plot
-# Groupby can be done based on multiple columns df.groupby(['Day of Week', 'Hour']).count()
 # improve printing of the most common words
-# Graphs for monthly number of messages
-# Monthly word averages
-# Monthly word count
-# Most common time of chatting, most common day, month as well
 
 # This loop creates a person object for each person participating in the chat
 for name in names:
     people.append(Person(name))
+
+text_file = open('Output.txt', 'w')
 
 for person in people:
     person.count_messages(chat_data)
@@ -152,16 +142,20 @@ for person in people:
     person.count_total_words(chat_data)
     person.calculate_average()
     person.count_media(chat_data)
-    #person.count_words_by_month_day_hour(chat_data)
+    person.count_words_by_month_day_hour(chat_data)
 
-    #words_by_month[person.name] = person.word_count_by_month
     print(person)
-'''
-words_by_month = pd.DataFrame(words_by_month.stack())
+    text_file.write(str(person))
+
+    words_by_month[person.name] = person.word_count_by_month
+    words_by_hour[person.name] = person.word_count_by_hour
+
+text_file.close()
+
 classify_msg(chat_data)
 
 sns.set_style('darkgrid')
-
+'''
 # plot of the amount of messages per month per person (here, specifically for 2019)
 figure1, ax1 = plt.subplots()
 sns.countplot(x=chat_data.loc[2019].index.get_level_values(level='Month'), data=chat_data.loc[2019], hue=chat_data.loc[2019].index.get_level_values(level='Person'))
@@ -176,9 +170,7 @@ figure2.savefig('MSGbyDayPlot.png')
 
 # plot of the amount of words per month per person (here, specifically for 2019)
 figure3, ax3 = plt.subplots()
-sns.barplot(x=words_by_month.index.get_level_values(level=0), y=words_by_month[0], hue=words_by_month.index.get_level_values(level=1))
-#sns.barplot(x=words_sum_sara.index, y=words_sum_sara, alpha=0.5, color='red')
-#sns.barplot(x=words_sum_kamil.index, y=words_sum_kamil, alpha=0.5, color='blue')
+words_by_month.plot.bar(ax=ax3)
 plt.ylabel('Number of Words')
 figure3.savefig('WordsByMonthPlot.png')
 
@@ -187,29 +179,20 @@ figure4, ax4 = plt.subplots()
 sns.countplot(x=chat_data.loc[2019].index.get_level_values(level='Hour'), data=chat_data.loc[2019], hue=chat_data.loc[2019].index.get_level_values(level='Person'))
 plt.ylabel('Number of Messages')
 figure4.savefig('MSGbyHourPlot.png')
-'''
-#per hour
-words_sara_hour = chat_data.loc[2019][chat_data.loc[2019]['Content'] != '<Media omitted>\n'].xs('Sara', level='Person')['Content'].apply(lambda x: len(x.split()))
-words_sum_sara_hour = words_sara_hour.groupby('Hour').sum()
-words_kamil_hour = chat_data.loc[2019][chat_data.loc[2019]['Content'] != '<Media omitted>\n'].xs('Kamil Kuźniak', level='Person')['Content'].apply(lambda x: len(x.split()))
-words_sum_kamil_hour = words_kamil_hour.groupby('Hour').sum()
-words_by_hour = pd.DataFrame({'Sara': words_sum_sara_hour, 'Kamil': words_sum_kamil_hour})
-words_by_hour = pd.DataFrame(words_by_hour.stack())
 
+# plot of the amount of words per hour per person (here, specifically for 2019)
 figure5, ax5 = plt.subplots()
-sns.barplot(x=words_by_hour.index.get_level_values(level=0), y=words_by_hour[0], hue=words_by_hour.index.get_level_values(level=1))
-#sns.barplot(x=words_sum_sara.index, y=words_sum_sara, alpha=0.5, color='red')
-#sns.barplot(x=words_sum_kamil.index, y=words_sum_kamil, alpha=0.5, color='blue')
+words_by_hour.plot.bar(ax=ax5)
 plt.ylabel('Number of Words')
 figure5.savefig('WordsByHourPlot.png')
-'''
+
 plt.tight_layout()
 plt.show()
-
-# print(chat_data)
+'''
+#with open('Output.txt', 'w') as text_file:
+#    text_file.write()
 
 # print('Kamil sent ' + str(round((1 - kamil_msg/sara_msg)*100)) + '% less messages than Sara')
 # print('Kamil sent ' + str(round((1 - kamil_words / sara_words) * 100)) + '% less words than Sara')
 
 # if __name__ == '__main__':
-'''

@@ -27,10 +27,9 @@ class Person:
 
     # change this because I added the column with the word number in each sentence
     def count_words_by_month_day_hour(self, chat_data):
-        self.word_count_by_month = chat_data.loc[2019][chat_data.loc[2019]['Content'] != '<Media omitted>\n'].xs(self.name, level='Person')['Content'].apply(lambda x: len(x.split()))
-        self.word_count_by_month = self.word_count_by_month.groupby('Month').sum()
-        self.word_count_by_day = self.word_count_by_month.groupby('Day').sum()
-        self.word_count_by_hour = self.word_count_by_hour.groupby('Hour').sum()
+        self.word_count_by_month = chat_data.loc[2019].xs(self.name, level='Person')['Word count'].groupby('Month').sum()
+        self.word_count_by_day = chat_data.loc[2019].xs(self.name, level='Person')['Word count'].groupby('Day').sum()
+        self.word_count_by_hour = chat_data.loc[2019].xs(self.name, level='Person')['Word count'].groupby('Hour').sum()
 
     def most_common_words(self, chat_data):
         # join connects all the messages from the chat_data into one huge string that is than lower cased and split
