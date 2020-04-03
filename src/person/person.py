@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 # used to remove common, useless words and punctuation
 from nltk.corpus import stopwords
-import string
 
 
 class Person:
