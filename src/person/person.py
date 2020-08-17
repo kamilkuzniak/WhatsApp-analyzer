@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 # used to remove common, useless words and punctuation
+import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 
